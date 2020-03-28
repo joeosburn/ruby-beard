@@ -1,0 +1,102 @@
+Metrics/BlockLength:
+  Enabled: false
+
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+Metrics/MethodLength:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Enabled: false
+
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/ClassLength:
+  Enabled: false
+
+Metrics/ModuleLength:
+  Enabled: false
+
+Layout/LineLength:
+  Max: 118 # Keep things fitting nicely on github
+  AllowURI: true
+
+Style/Documentation:
+  Enabled: false
+
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+Naming/AccessorMethodName:
+  Enabled: false
+
+Style/CaseEquality:
+  Enabled: false
+
+Style/Semicolon:
+  Enabled: false
+
+Style/EmptyMethod:
+  Enabled: false
+
+Style/PercentLiteralDelimiters:
+  Enabled: false
+
+Style/PerlBackrefs:
+  Enabled: false
+
+Style/SymbolArray:
+  Enabled: false
+
+Layout/SpaceInsideHashLiteralBraces:
+  EnforcedStyle: 'no_space'
+
+Layout/DotPosition:
+  EnforcedStyle: 'trailing'
+
+Layout/MultilineMethodCallIndentation:
+  EnforcedStyle: 'indented'
+
+Layout/EndAlignment:
+  EnforcedStyleAlignWith: 'variable'
+
+Layout/CaseIndentation:
+  EnforcedStyle: 'end'
+
+Layout/EmptyLineBetweenDefs:
+  AllowAdjacentOneLineDefs: true # single line method definitions don't need an empty line between them
+
+Style/SingleLineMethods:
+  Enabled: false
+
+Style/FormatString:
+  Enabled: false
+
+Naming/MethodParameterName:
+  AllowedNames: ['_', 'io', 'id', 'to', 'by', 'on', 'in', 'at']
+
+Naming/PredicateName:
+  Enabled: false
+
+Style/RegexpLiteral:
+  Enabled: false
+
+Style/ZeroLengthPredicate:
+  Enabled: false
+
+Layout/EmptyLineAfterGuardClause:
+  Enabled: false
+
+Naming/RescuedExceptionsVariableName:
+  Enabled: false
+
+Metrics/ParameterLists:
+  Enabled: false
+
+Layout/RescueEnsureAlignment:
+  Enabled: false
+
+Style/MultilineBlockChain:
+  Enabled: false
