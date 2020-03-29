@@ -1,22 +1,6 @@
 # frozen_string_literal: true
 
 class Beard::Compiler
-  class Map
-    class << self
-      def block(block_name)
-        [
-          "_context.in_block('#{block_name}') do"
-        ]
-      end
-
-      def block_end
-        [
-          'end'
-        ]
-      end
-    end
-  end
-
   STATEMENT = /{{\s*([\S\s(?!}})]+?)\s*}}(?!\})/.freeze
   EXPS = {
     block: /^block\s+(.[^}]*)/,
@@ -31,39 +15,36 @@ class Beard::Compiler
     @statements = []
   end
 
-  def capture(str, quoted = true)
-    str = quoted ? "\"#{str}\"" : "_context.eval('#{str}')"
-    "_context.capture(#{str})"
+  def statement_tag(match)
+    tag = EXPS.detect { |_, exp| exp =~ match[1] }&.dig(0)
+
+    if tag
+      arguments = $~.captures
+    else
+      arguments = [match[1]]
+      tag = :eval
+    end
+
+    [match.begin(0), match.end(0), tag, arguments]
   end
 
-  def capture_previous(template, previous, current)
-    current > previous ? capture(template[previous..current - 1]) : ''
-  end
-
-  def compile_tag(tag)
-    match = EXPS.detect { |_, exp| exp =~ tag }
-    match ? Map.send(match[0], *Regexp.last_match.captures) : capture(tag, false)
+  def capture_tag(start, finish)
+    return nil if start >= finish
+    [start, finish, :capture, [template[start..finish]]]
   end
 
   def compile
-    last_match = 0
-    lines = template.gsub(STATEMENT).map do
-      statement = Regexp.last_match
-      [
-        capture_previous(template, last_match, statement.begin(0)),
-        compile_tag(statement[1])
-      ].tap { last_match = statement.end(0) }
-    end
+    statements = template.gsub(STATEMENT).map { statement_tag(Regexp.last_match) }
+    statements << [template.length, template.length, :buffer, []]
 
-    lines << capture(template[last_match..template.length - 1]) if last_match < (template.length - 1)
+    template = statements.reduce([[0, 0, :set_path, [path]]]) do |tags, tag|
+      tags << capture_tag(tags.last[1], tag[0] - 1)
+      tags << tag
+    end.compact.map { |tag| Map.run(tag) }.flatten
 
     fn = <<~STR
       proc do |_context|
-        _context.path = '#{path}'
-
-        #{lines.flatten.join("\n")}
-
-        _context.buffer
+        #{template.join("\n")}
       end
     STR
 

@@ -4,6 +4,7 @@ class Beard; end
 
 require 'beard/context'
 require 'beard/compiler'
+require 'beard/map'
 
 class Beard
   attr_reader :templates, :root, :fns
