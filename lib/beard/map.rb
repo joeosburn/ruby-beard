@@ -8,37 +8,43 @@ class Beard::Compiler::Map
 
     def set_path(path)
       [
-        "_context.path = '#{path}'"
+        "_vm.path = '#{path}'"
       ]
     end
 
     def buffer
       [
-        '_context.buffer'
+        '_vm.buffer'
       ]
     end
 
     def capture(str)
       [
-        "_context.capture(\"#{str}\")"
+        "_vm.capture(\"#{str}\")"
       ]
     end
 
     def eval(str)
       [
-        "_context.capture(_context.eval('#{str}'))"
+        "_vm.capture(_vm.eval('#{str.gsub("'", "\\\\'")}'))"
       ]
     end
 
     def block(block_name)
       [
-        "_context.in_block('#{block_name}') do"
+        "_vm.in_block('#{block_name}') do"
       ]
     end
 
     def block_end
       [
         'end'
+      ]
+    end
+
+    def include(path, data)
+      [
+        "_vm.capture(_vm.include(#{path}, #{data.inspect} || {}))"
       ]
     end
   end

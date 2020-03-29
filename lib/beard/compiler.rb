@@ -3,6 +3,7 @@
 class Beard::Compiler
   STATEMENT = /{{\s*([\S\s(?!}})]+?)\s*}}(?!\})/.freeze
   EXPS = {
+    include: /^include\s+([^,]+)(?:,\s*([\s\S]*))?$/,
     block: /^block\s+(.[^}]*)/,
     block_end: /^endblock$/
   }.freeze
@@ -43,7 +44,7 @@ class Beard::Compiler
     end.compact.map { |tag| Map.run(tag) }.flatten
 
     fn = <<~STR
-      proc do |_context|
+      proc do |_vm|
         #{template.join("\n")}
       end
     STR

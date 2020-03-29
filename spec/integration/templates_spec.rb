@@ -12,6 +12,16 @@ describe 'Templates' do
     expect(beard.render('content')).to eq('some content')
   end
 
+  it 'includes templates' do
+    engine = Beard.new(
+      templates: {
+        '/content' => 'some content',
+        '/view' => "header {{include 'content'}} footer"
+      }
+    )
+    expect(engine.render('view')).to eq('header some content footer')
+  end
+
   it 'renders blocks' do
     engine = Beard.new(
       templates: {
