@@ -65,4 +65,28 @@ describe 'Templates' do
     )
     expect(engine.render('block').gsub(/\s+/, ' ')).to eq(' a footer -- bill -- subinfo ')
   end
+
+  it 'extends layouts' do
+    engine = Beard.new(
+      templates: {
+        '/view' => %{
+          {{extends 'layout'}}
+          page content
+          {{block nav}}
+            main navigation
+          {{endblock}}
+        },
+        '/layout' => %{
+          header
+          {{nav}}
+          -
+          {{content}}
+          footer
+        }
+      }
+    )
+
+    expect(engine.render('view').gsub(/\s+/, ' ').strip).
+      to eq('header main navigation - page content footer');
+  end
 end

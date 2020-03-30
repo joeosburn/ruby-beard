@@ -3,6 +3,7 @@
 class Beard::Compiler
   STATEMENT = /{{\s*([\S\s(?!}})]+?)\s*}}(?!\})/.freeze
   EXPS = {
+    extends: /^extends\s+(.+)$/,
     include: /^include\s+([\s\S]*)$/,
     block: /^block\s+(.[^}]*)/,
     block_end: /^endblock$/
@@ -23,7 +24,7 @@ class Beard::Compiler
       arguments = $~.captures
     else
       arguments = [match[1]]
-      tag = :eval
+      tag = :capture_eval
     end
 
     [match.begin(0), match.end(0), tag, arguments]
@@ -36,9 +37,9 @@ class Beard::Compiler
 
   def compile
     statements = template.gsub(STATEMENT).map { statement_tag(Regexp.last_match) }
-    statements << [template.length, template.length, :buffer, []]
+    statements << [template.length, template.length, :finish, []]
 
-    instructions = statements.reduce([[0, 0, :set_path, [path]]]) do |tags, tag|
+    instructions = statements.reduce([[0, 0, :set_template_path, [path]]]) do |tags, tag|
       tags << capture_tag(tags.last[1], tag[0] - 1)
       tags << tag
     end.compact

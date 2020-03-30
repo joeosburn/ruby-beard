@@ -7,8 +7,17 @@ class Beard::VM::Map
     @vm = vm
   end
 
-  def set_path(path)
-    vm.path = path
+  def finish
+    vm.extend if vm.extends_path
+    vm.buffer
+  end
+
+  def extends(path)
+    vm.extends_path = vm.eval(path)
+  end
+
+  def set_template_path(path)
+    vm.template_path = path
   end
 
   def buffer
@@ -19,7 +28,7 @@ class Beard::VM::Map
     vm.capture(str)
   end
 
-  def eval(str)
+  def capture_eval(str)
     capture(vm.eval(str))
   end
 

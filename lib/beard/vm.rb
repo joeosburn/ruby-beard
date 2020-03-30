@@ -14,7 +14,7 @@ class Beard::VM
     end
   end
 
-  Context = Struct.new(:vars, :buffer, :exec) do
+  Context = Struct.new(:vars, :buffer, :exec, :extends_path) do
     def initialize(*)
       super
       self.buffer ||= ''
@@ -26,7 +26,7 @@ class Beard::VM
   END_INSTRUCTIONS = %I[block_end].freeze
 
   attr_reader :heap, :contexts, :blocks, :cache
-  attr_accessor :path
+  attr_accessor :template_path
 
   def initialize(data, cache, heap: {})
     @cache = cache
@@ -70,6 +70,14 @@ class Beard::VM
     contexts.last.buffer = val
   end
 
+  def extends_path
+    contexts.last.extends_path
+  end
+
+  def extends_path=(val)
+    contexts.last.extends_path = val
+  end
+
   def in_block(name)
     blocks.push(Block.new(name))
 
@@ -85,10 +93,17 @@ class Beard::VM
     !blocks.empty? ? blocks.last.capture(str) : self.buffer += str
   end
 
-  def include(include_path, data = {})
+  def include(path, data = {})
     contexts.push(Context.new(data))
     prepare_exec
-    cache.retrieve(include_path, path).call(self).tap { contexts.pop }
+    cache.retrieve(path, template_path).call(self).tap { contexts.pop }
+  end
+
+  def extend
+    path = extends_path
+    contexts.push(Context.new(content: buffer))
+    prepare_exec
+    self.buffer = cache.retrieve(path, template_path).call(self).tap { contexts.pop }
   end
 
   def encode(str)
