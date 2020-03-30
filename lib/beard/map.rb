@@ -41,4 +41,8 @@ class Beard::VM::Map
   def include(args)
     capture(vm.include(*vm.eval("[#{args}]")))
   end
+
+  def put(varname)
+    vm.put(varname)
+  end
 end

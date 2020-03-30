@@ -10,6 +10,7 @@ describe 'Templates' do
         '/content' => 'some content'
       }
     )
+
     expect(beard.render('content')).to eq('some content')
   end
 
@@ -20,6 +21,7 @@ describe 'Templates' do
         '/view' => "header {{include 'content'}} footer"
       }
     )
+
     expect(engine.render('view')).to eq('header some content footer')
   end
 
@@ -88,5 +90,33 @@ describe 'Templates' do
 
     expect(engine.render('view').gsub(/\s+/, ' ').strip).
       to eq('header main navigation - page content footer');
+  end
+
+  it 'extends layouts with dynamic paths' do
+    engine = Beard.new(
+      templates: {
+        '/view' => '{{extends layout}}page',
+        '/base' => 'header {{put content}} footer',
+        '/page' => "{{extends \"/layouts/\#{layout}\"}}the page",
+        '/layouts/simple' => 'a layout {{put content}} bottom',
+        '/content' => "{{extends layout.gsub('_', '-')}}content",
+        '/base-layout' => 'header {{put content}} footer'
+      }
+    )
+
+    expect(engine.render('view', layout: 'base')).to eq('header page footer')
+    expect(engine.render('page', layout: 'simple')).to eq('a layout the page bottom')
+    expect(engine.render('content', layout: 'base_layout')).to eq('header content footer')
+  end
+
+  it 'extends layouts and renders the content with put' do
+    engine = Beard.new(
+      templates: {
+        '/view' => '{{extends "layout"}}page content',
+        '/layout' => 'header {{put content}} footer'
+      }
+    )
+
+    expect(engine.render('view')).to eq('header page content footer')
   end
 end

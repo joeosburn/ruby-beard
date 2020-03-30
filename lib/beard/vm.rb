@@ -106,6 +106,10 @@ class Beard::VM
     self.buffer = cache.retrieve(path, template_path).call(self).tap { contexts.pop }
   end
 
+  def put(varname)
+    capture(exec.eval(varname)) if exec.local_variables.include?(varname.to_sym)
+  end
+
   def encode(str)
     capture(str.
       gsub(/&(?!\\w+;)/, '&#38;').

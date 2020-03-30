@@ -4,9 +4,10 @@ class Beard::Compiler
   STATEMENT = /{{\s*([\S\s(?!}})]+?)\s*}}(?!\})/.freeze
   EXPS = {
     extends: /^extends\s+(.+)$/,
-    include: /^include\s+([\s\S]*)$/,
+    include: /^include\s+([\s\S]+)$/,
     block: /^block\s+(.[^}]*)/,
-    block_end: /^endblock$/
+    block_end: /^endblock$/,
+    put: /^put\s+([\s\S]+)$/
   }.freeze
 
   attr_reader :template, :path, :statements
