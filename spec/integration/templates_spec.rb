@@ -119,4 +119,32 @@ describe 'Templates' do
 
     expect(engine.render('view')).to eq('header page content footer')
   end
+
+  it 'handles for loops' do
+    engine = Beard.new(
+      templates: {
+        '/with-index' => 'names = {{for name, index in names}} {{name}} - {{index}}{{end}}',
+        '/no-index' => 'names = {{for name in names}} {{name}}{{end}}'
+      }
+    )
+    expect(engine.render('with-index', names: %w[Bill John Dave])).
+      to eq('names =  Bill - 0 John - 1 Dave - 2')
+    expect(engine.render('no-index', names: %w[Bill John Dave])).
+      to eq('names =  Bill John Dave')
+  end
+
+  it 'handles multiline for blocks with functions' do
+    engine = Beard.new(
+      templates: {
+        '/view' => %{
+        {{for name in ['charles', 'john', 'martin'].map { |n|
+          n.upcase
+        }}}
+          {{name}}
+        {{end}}
+        }
+      }
+    )
+    expect(engine.render('view').gsub(/\s+/m, ' ').strip).to eq('CHARLES JOHN MARTIN')
+  end
 end

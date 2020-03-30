@@ -33,9 +33,11 @@ class Beard::VM::Map
   end
 
   def block(name)
-    vm.in_block(name) do
-      yield
-    end
+    vm.in_block(name) { yield }
+  end
+
+  def for(value, key, obj)
+    vm.for(value, key, obj) { yield }
   end
 
   def include(args)

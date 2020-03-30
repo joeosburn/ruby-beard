@@ -7,7 +7,9 @@ class Beard::Compiler
     include: /^include\s+([\s\S]+)$/,
     block: /^block\s+(.[^}]*)/,
     block_end: /^endblock$/,
-    put: /^put\s+([\s\S]+)$/
+    put: /^put\s+([\s\S]+)$/,
+    for: /^for\s+([A-Za-z_][0-9A-Za-z_]+)(?:\s*,\s*([A-Za-z_][0-9A-Za-z_]+))?\s+in\s+(.+)$/m,
+    end: /^end$/
   }.freeze
 
   attr_reader :template, :path, :statements

@@ -10,7 +10,7 @@ class Beard::VM
     end
 
     def capture(str)
-      @buffer += str
+      @buffer += str.to_s
     end
   end
 
@@ -22,8 +22,8 @@ class Beard::VM
     end
   end
 
-  BLOCK_INSTRUCTIONS = %I[block].freeze
-  END_INSTRUCTIONS = %I[block_end].freeze
+  BLOCK_INSTRUCTIONS = %I[block for].freeze
+  END_INSTRUCTIONS = %I[end block_end].freeze
 
   attr_reader :heap, :contexts, :blocks, :cache
   attr_accessor :template_path
@@ -45,8 +45,9 @@ class Beard::VM
       arguments = instruction[3]
 
       if BLOCK_INSTRUCTIONS.include?(name)
+        block_position = position + 1
         map.send(name, *arguments) do
-          result, position = execute(instructions, position + 1, map)
+          result, position = execute(instructions, block_position, map)
         end
       else
         result = map.send(name, *arguments)
@@ -89,8 +90,22 @@ class Beard::VM
     end.buffer
   end
 
+  def for(value, key, obj)
+    old_value = exec.local_variable_get(value) if exec.local_variables.include?(value)
+    old_key = exec.local_variable_get(key) if key && exec.local_variables.include?(key)
+
+    exec.eval(obj).each.with_index do |item, index|
+      exec.local_variable_set(value, item)
+      exec.local_variable_set(key, index) if key
+      yield
+    end
+
+    exec.local_variable_set(value, old_value) if old_value
+    exec.local_variable_set(key, old_key) if old_key
+  end
+
   def capture(str)
-    !blocks.empty? ? blocks.last.capture(str) : self.buffer += str
+    !blocks.empty? ? blocks.last.capture(str) : self.buffer += str.to_s
   end
 
   def include(path, data = {})
