@@ -3,7 +3,7 @@
 class Beard::Compiler
   STATEMENT = /{{\s*([\S\s(?!}})]+?)\s*}}(?!\})/.freeze
   EXPS = {
-    include: /^include\s+([^,]+)(?:,\s*([\s\S]*))?$/,
+    include: /^include\s+([\s\S]*)$/,
     block: /^block\s+(.[^}]*)/,
     block_end: /^endblock$/
   }.freeze
@@ -30,7 +30,7 @@ class Beard::Compiler
   end
 
   def capture_tag(start, finish)
-    return nil if start >= finish
+    return nil if start > finish
     [start, finish, :capture, [template[start..finish]]]
   end
 

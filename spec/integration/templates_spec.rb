@@ -23,6 +23,24 @@ describe 'Templates' do
     expect(engine.render('view')).to eq('header some content footer')
   end
 
+  it 'includes templates with dynamic paths' do
+    engine = Beard.new(
+      templates: {
+        '/view' => %{header
+          {{include partial}}
+          {{include \"/includes/\#{support}\"}}
+          {{include \"/includes/\#{other.gsub('_', '-')}\"}}
+        },
+        '/includes/content' => 'Partial Content',
+        '/includes/footer' => 'Footer',
+        '/includes/other-content' => 'Content!'
+      }
+    )
+
+    data = {partial: '/includes/content', support: 'footer', other: 'other_content'}
+    expect(engine.render('view', data).gsub(/\s+/, ' ').strip).to eq('header Partial Content Footer Content!')
+  end
+
   it 'renders blocks' do
     engine = Beard.new(
       templates: {

@@ -29,7 +29,7 @@ class Beard::VM::Map
     end
   end
 
-  def include(path, data)
-    capture(vm.include(vm.eval(path), data || {}))
+  def include(args)
+    capture(vm.include(*vm.eval("[#{args}]")))
   end
 end

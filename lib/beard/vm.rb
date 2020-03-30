@@ -33,6 +33,7 @@ class Beard::VM
     @contexts = [Context.new(data)]
     @heap = heap
     @blocks = []
+    prepare_exec
   end
 
   def execute(instructions, position = 0, map = Map.new(self))
