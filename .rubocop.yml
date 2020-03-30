@@ -75,7 +75,7 @@ Style/FormatString:
   Enabled: false
 
 Naming/MethodParameterName:
-  AllowedNames: ['_', 'io', 'id', 'to', 'by', 'on', 'in', 'at']
+  Enabled: false
 
 Naming/PredicateName:
   Enabled: false

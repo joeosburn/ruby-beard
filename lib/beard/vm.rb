@@ -22,6 +22,9 @@ class Beard::VM
     end
   end
 
+  BLOCK_INSTRUCTIONS = %I[block].freeze
+  END_INSTRUCTIONS = %I[block_end].freeze
+
   attr_reader :heap, :contexts, :blocks, :cache
   attr_accessor :path
 
@@ -30,6 +33,28 @@ class Beard::VM
     @contexts = [Context.new(data)]
     @heap = heap
     @blocks = []
+  end
+
+  def execute(instructions, position = 0, map = Map.new(self))
+    instruction = instructions[position]
+    result = nil
+
+    while instruction && !END_INSTRUCTIONS.include?(instruction[2])
+      name = instruction[2]
+      arguments = instruction[3]
+
+      if BLOCK_INSTRUCTIONS.include?(name)
+        map.send(name, *arguments) do
+          result, position = execute(instructions, position + 1, map)
+        end
+      else
+        result = map.send(name, *arguments)
+      end
+
+      instruction = instructions[position += 1]
+    end
+
+    [result, position]
   end
 
   def eval(str)

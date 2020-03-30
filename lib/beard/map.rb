@@ -1,51 +1,35 @@
 # frozen_string_literal: true
 
-class Beard::Compiler::Map
-  class << self
-    def run(tag)
-      send(tag[2], *tag[3])
-    end
+class Beard::VM::Map
+  attr_reader :vm
 
-    def set_path(path)
-      [
-        "_vm.path = '#{path}'"
-      ]
-    end
+  def initialize(vm)
+    @vm = vm
+  end
 
-    def buffer
-      [
-        '_vm.buffer'
-      ]
-    end
+  def set_path(path)
+    vm.path = path
+  end
 
-    def capture(str)
-      [
-        "_vm.capture(\"#{str}\")"
-      ]
-    end
+  def buffer
+    vm.buffer
+  end
 
-    def eval(str)
-      [
-        "_vm.capture(_vm.eval('#{str.gsub("'", "\\\\'")}'))"
-      ]
-    end
+  def capture(str)
+    vm.capture(str)
+  end
 
-    def block(block_name)
-      [
-        "_vm.in_block('#{block_name}') do"
-      ]
-    end
+  def eval(str)
+    capture(vm.eval(str))
+  end
 
-    def block_end
-      [
-        'end'
-      ]
+  def block(name)
+    vm.in_block(name) do
+      yield
     end
+  end
 
-    def include(path, data)
-      [
-        "_vm.capture(_vm.include(#{path}, #{data.inspect} || {}))"
-      ]
-    end
+  def include(path, data)
+    capture(vm.include(vm.eval(path), data || {}))
   end
 end

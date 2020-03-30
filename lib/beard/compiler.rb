@@ -38,19 +38,11 @@ class Beard::Compiler
     statements = template.gsub(STATEMENT).map { statement_tag(Regexp.last_match) }
     statements << [template.length, template.length, :buffer, []]
 
-    template = statements.reduce([[0, 0, :set_path, [path]]]) do |tags, tag|
+    instructions = statements.reduce([[0, 0, :set_path, [path]]]) do |tags, tag|
       tags << capture_tag(tags.last[1], tag[0] - 1)
       tags << tag
-    end.compact.map { |tag| Map.run(tag) }.flatten
+    end.compact
 
-    fn = <<~STR
-      proc do |_vm|
-        #{template.join("\n")}
-      end
-    STR
-
-    # puts fn
-
-    eval(fn) # rubocop:disable Security/Eval
+    proc { |vm| vm.execute(instructions)[0] }
   end
 end

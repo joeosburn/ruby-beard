@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'beard'
+require 'benchmark'
 
 describe 'Templates' do
   it 'renders content' do
